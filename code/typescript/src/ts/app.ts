@@ -1,1 +1,3 @@
-console.log("Running");
+import { phones } from './collections/phones';
+
+console.log(phones.allPhones);
