@@ -30,6 +30,7 @@ module.exports = {
             patterns: [
                 { from: 'src/html', to: 'html' },
                 { from: 'src/css', to: 'css' },
+                { from: 'src/assets', to: 'assets' },
             ],
         }),
     ],

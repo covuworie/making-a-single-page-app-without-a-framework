@@ -1,3 +1,4 @@
 import { phones } from './collections/phones';
+import { PhoneList } from './components/phone-list';
 
-console.log(phones.allPhones);
+PhoneList.render(phones.allPhones);
