@@ -1,19 +1,35 @@
 import Phone from "../models/phone";
 import { Manufacturer, Storage, OS, Camera } from "../models/specs";
+import { phones } from "../collections/phones";
 
 export class PhoneList {
-  public constructor() {}
+  private allProducts: HTMLUListElement;
+  private singleProduct: HTMLDivElement;
+  private productsList: HTMLUListElement;
+  private phones: Phone[];
 
-  public static render(phones: Phone[]) {
-    const phoneList = document.querySelector(
+  public constructor() {
+    this.allProducts = document.querySelector(
+      ".all-products"
+    ) as HTMLUListElement;
+    this.singleProduct = document.querySelector(
+      ".single-product"
+    ) as HTMLDivElement;
+    this.productsList = document.querySelector(
       ".products-list"
     ) as HTMLUListElement;
 
+    this.phones = phones.allPhones;
+    this.render();
+    this.addClickEventListeners();
+  }
+
+  private render() {
     const template = document.querySelector(
       "#product-template"
     ) as HTMLTemplateElement;
 
-    phones.map((phone) => {
+    this.phones.map((phone) => {
       const phoneItem = document.importNode(template, true);
 
       const labelsToValues: {
@@ -37,12 +53,39 @@ export class PhoneList {
         );
       }
 
-      phoneList.appendChild(phoneItem.content);
+      this.productsList.appendChild(phoneItem.content);
     });
 
-    const allProducts = document.querySelector(
-      ".all-products"
-    ) as HTMLUListElement;
-    allProducts.classList.add("visible");
+    this.allProducts.classList.add("visible");
+  }
+
+  private addClickEventListeners() {
+    for (const product of this.productsList.children) {
+      (product as HTMLLIElement).addEventListener("click", (_: MouseEvent) => {
+        this.renderPhone(product.getAttribute("data-index")!);
+      });
+    }
+  }
+
+  private renderPhone(phoneId: string) {
+    const preview = document.querySelector(".preview-large") as HTMLDivElement;
+
+    this.phones.forEach((phone) => {
+      if (phone.id.toString() === phoneId) {
+        preview.querySelector("h3")!.textContent = phone.name;
+        preview.querySelector("img")!.setAttribute("src", phone.image.large);
+        preview.querySelector("p")!.textContent = phone.description;
+      }
+    });
+
+    this.singleProduct.classList.add("visible");
+    this.addCloseEventListener();
+  }
+
+  private addCloseEventListener() {
+    const close = document.querySelector(".close") as HTMLSpanElement;
+    close!.addEventListener("click", () => {
+      this.singleProduct.classList.remove("visible");
+    });
   }
 }
