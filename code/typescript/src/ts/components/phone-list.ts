@@ -1,14 +1,48 @@
 import Phone from "../models/phone";
 import { Manufacturer, Storage, OS, Camera } from "../models/specs";
 import { phones } from "../collections/phones";
+import PhoneFilter from "./phone-filter";
 
-export class PhoneList {
+export default class PhoneList {
+  private static instance: PhoneList;
+  private phones: Phone[];
+
   private allProducts: HTMLUListElement;
   private singleProduct: HTMLDivElement;
   private productsList: HTMLUListElement;
-  private phones: Phone[];
 
-  public constructor() {
+  public static get Instance() {
+    if (!PhoneList.instance) {
+      PhoneList.instance = new PhoneList();
+    }
+
+    return PhoneList.instance;
+  }
+
+  public static renderPhones() {
+    const products = Array.from(
+      document.querySelectorAll("li[data-index]")
+    ) as HTMLLIElement[];
+
+    for (const product of products) {
+      product.classList.remove("hidden");
+    }
+
+    if (PhoneFilter.IsNoCheckboxChecked()) {
+      return;
+    }
+
+    const matchingIds = PhoneFilter.filter(PhoneList.Instance.phones);
+    console.log(matchingIds);
+    for (const product of products) {
+      const id = parseInt(product.getAttribute("data-index")!);
+      if (!matchingIds.includes(id)) {
+        product.classList.add("hidden");
+      }
+    }
+  }
+
+  private constructor() {
     this.allProducts = document.querySelector(
       ".all-products"
     ) as HTMLUListElement;
@@ -20,11 +54,11 @@ export class PhoneList {
     ) as HTMLUListElement;
 
     this.phones = phones.allPhones;
-    this.render();
+    this.renderAllPhones();
     this.addClickEventListeners();
   }
 
-  private render() {
+  private renderAllPhones() {
     const template = document.querySelector(
       "#product-template"
     ) as HTMLTemplateElement;
@@ -60,8 +94,10 @@ export class PhoneList {
   }
 
   private addClickEventListeners() {
-    for (const product of this.productsList.children) {
-      (product as HTMLLIElement).addEventListener("click", (_: MouseEvent) => {
+    for (const product of Array.from(
+      this.productsList.children
+    ) as HTMLLIElement[]) {
+      product.addEventListener("click", (_: MouseEvent) => {
         this.renderPhone(product.getAttribute("data-index")!);
       });
     }

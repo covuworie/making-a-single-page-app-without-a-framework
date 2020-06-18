@@ -1,3 +1,5 @@
-import { PhoneList } from "./components/phone-list";
+import PhoneList from "./components/phone-list";
+import PhoneFilter from "./components/phone-filter";
 
-new PhoneList();
+PhoneList.Instance;
+PhoneFilter.Instance;
