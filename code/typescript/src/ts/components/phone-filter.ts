@@ -67,13 +67,22 @@ export default class PhoneFilter {
     this.checkboxes = Array.from(
       document.querySelectorAll(".filter-criteria input[type=checkbox]")
     );
-    this.addCheckboxEventListeners();
+    this.addCheckboxListeners();
+    this.addClearFilterListener();
   }
 
-  private addCheckboxEventListeners() {
+  private addCheckboxListeners() {
     for (const checkbox of this.checkboxes) {
       checkbox.addEventListener("change", PhoneList.renderPhones);
     }
+  }
+
+  private addClearFilterListener() {
+    const button = document.querySelector(".filter-clear") as HTMLButtonElement;
+    button.addEventListener("click", (event: MouseEvent) => {
+      event.preventDefault();
+      this.clearFilters();
+    });
   }
 
   private static createMatchingIds(
@@ -124,5 +133,13 @@ export default class PhoneFilter {
       return false;
     }
     return true;
+  }
+
+  private clearFilters() {
+    for (const checkbox of PhoneFilter.Instance.checkboxes) {
+      checkbox.checked = false;
+    }
+
+    PhoneList.renderPhones();
   }
 }

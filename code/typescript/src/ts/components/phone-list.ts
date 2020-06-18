@@ -33,7 +33,6 @@ export default class PhoneList {
     }
 
     const matchingIds = PhoneFilter.filter(PhoneList.Instance.phones);
-    console.log(matchingIds);
     for (const product of products) {
       const id = parseInt(product.getAttribute("data-index")!);
       if (!matchingIds.includes(id)) {
