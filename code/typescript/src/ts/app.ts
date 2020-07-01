@@ -1,5 +1,4 @@
-import PhoneList from "./components/phone-list";
-import PhoneFilter from "./components/phone-filter";
+import Router from "./routers/router";
 
-PhoneList.Instance;
-PhoneFilter.Instance;
+Router.Instance;
+
