@@ -1,6 +1,7 @@
 import PhoneList from "./phone-list";
 import { Manufacturer, Storage, OS, Camera } from "../models/specs";
 import Phone from "../models/phone";
+import Router from "../routers/router";
 
 export default class PhoneFilter {
   private static instance: PhoneFilter;
@@ -54,13 +55,31 @@ export default class PhoneFilter {
     return matchingIds;
   }
 
-  public static IsNoCheckboxChecked() {
+  public static HasNoCheckboxChecked() {
     for (const checkbox of this.Instance.checkboxes) {
       if (checkbox.checked) {
         return false;
       }
     }
     return true;
+  }
+
+  public formQueryString() {
+    const queryPairs: string[] = [];
+    for (const checkbox of this.checkboxes) {
+      if (!checkbox.checked) {
+        continue;
+      }
+
+      queryPairs.push(
+        encodeURIComponent(checkbox.name) +
+          "=" +
+          encodeURIComponent(checkbox.value)
+      );
+    }
+
+    const queryString = queryPairs.join("&");
+    return queryString;
   }
 
   private constructor() {
@@ -140,6 +159,6 @@ export default class PhoneFilter {
       checkbox.checked = false;
     }
 
-    PhoneList.renderPhones();
+    Router.Instance.navigate("", { trigger: true });
   }
 }

@@ -30,7 +30,7 @@ export default class PhoneList {
     this.phones.map((phone) => {
       const phoneItem = document.importNode(template, true);
 
-      const imagePath = `${location.origin}/app/${phone.image.small}`
+      const imagePath = `${location.origin}/app/${phone.image.small}`;
       const labelsToValues: {
         [index: string]: number | string | Manufacturer | Storage | OS | Camera;
       } = {
@@ -63,12 +63,12 @@ export default class PhoneList {
     const products = Array.from(
       document.querySelectorAll("li[data-index]")
     ) as HTMLLIElement[];
-
     for (const product of products) {
       product.classList.remove("hidden");
     }
 
-    if (PhoneFilter.IsNoCheckboxChecked()) {
+    if (PhoneFilter.HasNoCheckboxChecked()) {
+      Router.Instance.navigate("", { trigger: true });
       return;
     }
 
@@ -79,6 +79,9 @@ export default class PhoneList {
         product.classList.add("hidden");
       }
     }
+
+    const queryString = PhoneFilter.Instance.formQueryString();
+    Router.Instance.navigate(`/filter?${queryString}`, { trigger: true });
   }
 
   public renderPhone(phoneId: string) {
@@ -87,10 +90,8 @@ export default class PhoneList {
     this.phones.forEach((phone) => {
       if (phone.id.toString() === phoneId) {
         preview.querySelector("h3")!.textContent = phone.name;
-        const imagePath = `${location.origin}/app/${phone.image.large}`
-        preview
-          .querySelector("img")!
-          .setAttribute("src", imagePath);
+        const imagePath = `${location.origin}/app/${phone.image.large}`;
+        preview.querySelector("img")!.setAttribute("src", imagePath);
         preview.querySelector("p")!.textContent = phone.description;
 
         Router.Instance.navigate(`/product/${phone.id}`, { trigger: true });

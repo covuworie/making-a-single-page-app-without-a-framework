@@ -14,7 +14,6 @@ export default class Router extends Backbone.Router {
   }
 
   private constructor() {
-    console.log("Called constructor");
     super({
       routes: {
         "": "renderAllPhones",
@@ -27,7 +26,7 @@ export default class Router extends Backbone.Router {
     Backbone.history.start({ root: "/app/" });
   }
 
-  public renderAllPhones() {  
+  public renderAllPhones() {
     PhoneList.Instance.renderAllPhones();
     PhoneList.Instance.addClickEventListeners();
     PhoneFilter.Instance;
