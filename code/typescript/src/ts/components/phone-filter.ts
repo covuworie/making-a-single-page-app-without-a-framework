@@ -1,4 +1,3 @@
-import PhoneList from "./phone-list";
 import { Manufacturer, Storage, OS, Camera } from "../models/specs";
 import Phone from "../models/phone";
 import Router from "../routers/router";
@@ -55,6 +54,29 @@ export default class PhoneFilter {
     return matchingIds;
   }
 
+  public static UpdateFilterFromQuery(fragment: string) {
+    PhoneFilter.Instance.clearFilters();
+
+    const query = fragment.replace("filter?", "");
+    const parts = query.split("&");
+    parts.forEach((part) => {
+      const [name, value] = part.split("=");
+      for (const checkbox of PhoneFilter.Instance.checkboxes) {
+        if (checkbox.name === name && checkbox.value === value) {
+          checkbox.checked = true;
+        }
+      }
+    });
+
+    Router.Instance.renderPhones(fragment);
+  }
+
+  public clearFilters() {
+    for (const checkbox of PhoneFilter.Instance.checkboxes) {
+      checkbox.checked = false;
+    }
+  }
+
   public static HasNoCheckboxChecked() {
     for (const checkbox of this.Instance.checkboxes) {
       if (checkbox.checked) {
@@ -92,7 +114,14 @@ export default class PhoneFilter {
 
   private addCheckboxListeners() {
     for (const checkbox of this.checkboxes) {
-      checkbox.addEventListener("change", PhoneList.renderPhones);
+      checkbox.addEventListener("change", (_: Event) => {
+        const query = PhoneFilter.Instance.formQueryString();
+        if (query.length === 0) {
+          Router.Instance.navigate("", { trigger: true });
+        } else {
+          Router.Instance.navigate(`filter?${query}`, { trigger: true });
+        }
+      });
     }
   }
 
@@ -101,6 +130,7 @@ export default class PhoneFilter {
     button.addEventListener("click", (event: MouseEvent) => {
       event.preventDefault();
       this.clearFilters();
+      Router.Instance.navigate("", { trigger: true });
     });
   }
 
@@ -152,13 +182,5 @@ export default class PhoneFilter {
       return false;
     }
     return true;
-  }
-
-  private clearFilters() {
-    for (const checkbox of PhoneFilter.Instance.checkboxes) {
-      checkbox.checked = false;
-    }
-
-    Router.Instance.navigate("", { trigger: true });
   }
 }

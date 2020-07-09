@@ -17,6 +17,7 @@ export default class Router extends Backbone.Router {
     super({
       routes: {
         "": "renderAllPhones",
+        "filter?:query": "renderPhones",
         "product/:phoneId": "renderPhone",
       },
     });
@@ -24,6 +25,7 @@ export default class Router extends Backbone.Router {
 
   public initialize() {
     Backbone.history.start({ root: "/app/" });
+    this.addFilterNavigationListener();
   }
 
   public renderAllPhones() {
@@ -34,5 +36,19 @@ export default class Router extends Backbone.Router {
 
   public renderPhone(phoneId: number) {
     PhoneList.Instance.renderPhone(phoneId.toString());
+  }
+
+  public renderPhones(filter: string) {
+    PhoneList.renderPhones(filter);
+  }
+
+  private addFilterNavigationListener() {
+    window.addEventListener("hashchange", (_: HashChangeEvent) => {
+      const fragment = Backbone.history.getFragment();
+      if (!fragment.startsWith("filter?")) {
+        return;
+      }
+      PhoneFilter.UpdateFilterFromQuery(fragment);
+    });
   }
 }

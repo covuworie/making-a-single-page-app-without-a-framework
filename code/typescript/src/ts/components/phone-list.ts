@@ -21,6 +21,7 @@ export default class PhoneList {
   }
 
   public renderAllPhones() {
+    PhoneFilter.Instance.clearFilters();
     this.productsList.innerHTML = "";
 
     const template = document.querySelector(
@@ -59,17 +60,14 @@ export default class PhoneList {
     this.allProducts.classList.add("visible");
   }
 
-  public static renderPhones() {
+  public static renderPhones(_: string) {
+    PhoneList.Instance.singleProduct.classList.remove("visible");
+
     const products = Array.from(
       document.querySelectorAll("li[data-index]")
     ) as HTMLLIElement[];
     for (const product of products) {
       product.classList.remove("hidden");
-    }
-
-    if (PhoneFilter.HasNoCheckboxChecked()) {
-      Router.Instance.navigate("", { trigger: true });
-      return;
     }
 
     const matchingIds = PhoneFilter.filter(PhoneList.Instance.phones);
@@ -79,9 +77,6 @@ export default class PhoneList {
         product.classList.add("hidden");
       }
     }
-
-    const queryString = PhoneFilter.Instance.formQueryString();
-    Router.Instance.navigate(`/filter?${queryString}`, { trigger: true });
   }
 
   public renderPhone(phoneId: string) {
@@ -94,7 +89,7 @@ export default class PhoneList {
         preview.querySelector("img")!.setAttribute("src", imagePath);
         preview.querySelector("p")!.textContent = phone.description;
 
-        Router.Instance.navigate(`/product/${phone.id}`, { trigger: true });
+        Router.Instance.navigate(`product/${phone.id}`, { trigger: true });
       }
     });
 
@@ -131,8 +126,12 @@ export default class PhoneList {
     const close = document.querySelector(".close") as HTMLSpanElement;
     close!.addEventListener("click", () => {
       this.singleProduct.classList.remove("visible");
-
-      Router.Instance.navigate("", { trigger: true });
+      const query = PhoneFilter.Instance.formQueryString();
+      if (query.length === 0) {
+        Router.Instance.navigate("", { trigger: true });
+      } else {
+        Router.Instance.navigate(`filter?${query}`, { trigger: true });
+      }
     });
   }
 }
