@@ -77,15 +77,6 @@ export default class PhoneFilter {
     }
   }
 
-  public static HasNoCheckboxChecked() {
-    for (const checkbox of this.Instance.checkboxes) {
-      if (checkbox.checked) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   public formQueryString() {
     const queryPairs: string[] = [];
     for (const checkbox of this.checkboxes) {

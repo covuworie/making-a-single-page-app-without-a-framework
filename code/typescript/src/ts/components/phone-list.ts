@@ -4,12 +4,14 @@ import { phones } from "../collections/phones";
 import PhoneFilter from "./phone-filter";
 import Router from "../routers/router";
 
+type Pages = "all-products" | "single-product" | "error";
+type PageVisibilty = "show" | "hide";
+
 export default class PhoneList {
   private static instance: PhoneList;
   private phones: Phone[];
 
-  private allProducts: HTMLUListElement;
-  private singleProduct: HTMLDivElement;
+  private pages: HTMLDivElement[];
   private productsList: HTMLUListElement;
 
   public static get Instance() {
@@ -56,13 +58,14 @@ export default class PhoneList {
       this.productsList.appendChild(phoneItem.content);
     });
 
-    this.singleProduct.classList.remove("visible");
-    this.allProducts.classList.add("visible");
+    PhoneList.Instance.togglePageVisibility(
+      ["single-product", "error"],
+      "hide"
+    );
+    PhoneList.Instance.togglePageVisibility(["all-products"], "show");
   }
 
   public static renderPhones(_: string) {
-    PhoneList.Instance.singleProduct.classList.remove("visible");
-
     const products = Array.from(
       document.querySelectorAll("li[data-index]")
     ) as HTMLLIElement[];
@@ -77,6 +80,12 @@ export default class PhoneList {
         product.classList.add("hidden");
       }
     }
+
+    PhoneList.Instance.togglePageVisibility(
+      ["single-product", "error"],
+      "hide"
+    );
+    PhoneList.Instance.togglePageVisibility(["all-products"], "show");
   }
 
   public renderPhone(phoneId: string) {
@@ -93,8 +102,23 @@ export default class PhoneList {
       }
     });
 
-    this.singleProduct.classList.add("visible");
+    PhoneList.Instance.togglePageVisibility(["error"], "hide");
+    PhoneList.Instance.togglePageVisibility(["single-product"], "show");
     this.addCloseEventListener();
+  }
+
+  public togglePageVisibility(pages: Pages[], visibility: PageVisibilty) {
+    for (const page of pages) {
+      this.pages.forEach((page_) => {
+        if (page_.classList.contains(page)) {
+          if (visibility === "show") {
+            page_.classList.add("visible");
+          } else if (visibility === "hide") {
+            page_.classList.remove("visible");
+          }
+        }
+      });
+    }
   }
 
   public addClickEventListeners() {
@@ -109,12 +133,9 @@ export default class PhoneList {
   }
 
   private constructor() {
-    this.allProducts = document.querySelector(
-      ".all-products"
-    ) as HTMLUListElement;
-    this.singleProduct = document.querySelector(
-      ".single-product"
-    ) as HTMLDivElement;
+    this.pages = Array.from(
+      document.querySelectorAll(".page")
+    ) as HTMLDivElement[];
     this.productsList = document.querySelector(
       ".products-list"
     ) as HTMLUListElement;
@@ -125,7 +146,7 @@ export default class PhoneList {
   private addCloseEventListener() {
     const close = document.querySelector(".close") as HTMLSpanElement;
     close!.addEventListener("click", () => {
-      this.singleProduct.classList.remove("visible");
+      PhoneList.Instance.togglePageVisibility(["single-product"], "hide");
       const query = PhoneFilter.Instance.formQueryString();
       if (query.length === 0) {
         Router.Instance.navigate("", { trigger: true });

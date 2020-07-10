@@ -19,6 +19,7 @@ export default class Router extends Backbone.Router {
         "": "renderAllPhones",
         "filter?:query": "renderPhones",
         "product/:phoneId": "renderPhone",
+        "*notfound": "render404",
       },
     });
   }
@@ -40,6 +41,14 @@ export default class Router extends Backbone.Router {
 
   public renderPhones(filter: string) {
     PhoneList.renderPhones(filter);
+  }
+
+  public render404() {
+    PhoneList.Instance.togglePageVisibility(
+      ["all-products", "single-product"],
+      "hide"
+    );
+    PhoneList.Instance.togglePageVisibility(["error"], "show");
   }
 
   private addFilterNavigationListener() {
