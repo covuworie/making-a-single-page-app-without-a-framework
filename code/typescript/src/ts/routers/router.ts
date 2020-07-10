@@ -18,7 +18,7 @@ export default class Router extends Backbone.Router {
       routes: {
         "": "renderAllPhones",
         "filter?:query": "renderPhones",
-        "product/:phoneId": "renderPhone",
+        "product/:phoneId(/)": "renderPhone",
         "*notfound": "render404",
       },
     });
