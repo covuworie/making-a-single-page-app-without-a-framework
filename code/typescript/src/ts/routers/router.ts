@@ -1,6 +1,7 @@
 import Backbone from "backbone";
 import PhoneList from "../components/phone-list";
 import PhoneFilter from "../components/phone-filter";
+import Specs from "../models/specs";
 
 export default class Router extends Backbone.Router {
   private static instance: Router;
@@ -57,7 +58,50 @@ export default class Router extends Backbone.Router {
       if (!fragment.startsWith("filter?")) {
         return;
       }
+      if (!this.isQueryValid(fragment)) {
+        this.render404();
+        return;
+      }
       PhoneFilter.UpdateFilterFromQuery(fragment);
     });
+  }
+
+  private isQueryValid(fragment: string) {
+    const query = fragment.replace("filter?", "");
+    const parts = query.split("&");
+
+    for (const part of parts) {
+      const [name, value] = part.split("=");
+
+      switch (name) {
+        case "manufacturer":
+          if (!Specs.isOfTypeManufacturer(value)) {
+            return false;
+          }
+          break;
+
+        case "storage":
+          if (!Specs.isOfTypeStorage(+value)) {
+            return false;
+          }
+          break;
+        case "os":
+          if (!Specs.isOfTypeOS(value)) {
+            return false;
+          }
+          break;
+
+        case "camera":
+          if (!Specs.isOfTypeCamera(+value)) {
+            return false;
+          }
+          break;
+
+        default:
+          return false;
+      }
+    }
+
+    return true;
   }
 }
